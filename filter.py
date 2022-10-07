@@ -26,10 +26,8 @@ print(tf.config.list_physical_devices('GPU'))
 
 # %%
 CAT, DOG = 'Cats', 'Dogs'
-uri = 'downloads/{}/{}.jpg'
+uri = r'downloads/CatsDogs/{}/{}.jpg'
 
-# %% [markdown]
-# # baumiao
 
 # %%
 input_shape = (256, 256, 3) # (heigt, width, D)
@@ -51,7 +49,7 @@ warnings.filterwarnings("error")
 bad_paths = []
 
 for e in [CAT,DOG]:
-    for pth in Path(f'downloads/{e}').rglob("*"):
+    for pth in Path(f'downloads/CatsDogs/{e}').rglob("*"):
         
         ext = imghdr.what(pth)
         if ext is None:
@@ -96,7 +94,7 @@ for image_path in img_paths:
 bad_paths = []
 
 for folder_name in ("Cats", "Dogs"):
-    folder_path = os.path.join("downloads", folder_name)
+    folder_path = os.path.join("downloads/CatsDogs", folder_name)
     for fname in os.listdir(folder_path):
         fpath = os.path.join(folder_path, fname)
         
