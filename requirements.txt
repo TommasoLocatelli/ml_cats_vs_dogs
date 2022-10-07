@@ -1,0 +1,9 @@
+ipykernel
+ipywidgets
+pandas
+seaborn
+matplotlib
+Pillow
+tensorflow < 3
+opencv-python
+black
