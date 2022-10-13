@@ -4,11 +4,11 @@ import PIL
 import PIL.Image
 import tensorflow as tf
 
-def ready_to_be_used_dataset(seed=123):
+def ready_to_be_used_dataset(seed=123, image_squared_size=256):
     data_dir = pathlib.Path('downloads\CatsDogs')
     batch_size = 42
-    img_height = 1000
-    img_width = 1000
+    img_height = image_squared_size
+    img_width = image_squared_size
     train_ds = tf.keras.utils.image_dataset_from_directory(
         data_dir,
         validation_split=0.2,
