@@ -4,7 +4,7 @@ import PIL
 import PIL.Image
 import tensorflow as tf
 
-def ready_to_be_used_dataset(seed=123, image_squared_size=256):
+def ready_to_be_used_dataset(seed=123, image_squared_size=256, color_mode='rgb'): #color_mode	One of "grayscale", "rgb", "rgba". Default: "rgb"
     data_dir = pathlib.Path('downloads\CatsDogs')
     batch_size = 42
     img_height = image_squared_size
@@ -12,12 +12,14 @@ def ready_to_be_used_dataset(seed=123, image_squared_size=256):
     train_ds = tf.keras.utils.image_dataset_from_directory(
         data_dir,
         validation_split=0.2,
+        color_mode=color_mode,
         subset="training",
         seed=seed,
         image_size=(img_height, img_width),
         batch_size=batch_size)
     val_ds = tf.keras.utils.image_dataset_from_directory(
         data_dir,
+        color_mode=color_mode,
         validation_split=0.2,
         subset="validation",
         seed=seed,
