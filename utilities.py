@@ -38,3 +38,24 @@ def tensor_to_image(tensor):
         assert tensor.shape[0] == 1
         tensor = tensor[0]
     return PIL.Image.fromarray(tensor)
+
+def performance_plot(history):
+    plt.figure(figsize=(16, 6))
+
+    # Plot loss
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.ylabel('loss', size=12)
+    plt.xlabel('epoch', size=12)
+    plt.legend(['train', 'val'], fontsize=10)
+
+    # Plot accuracy
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.ylabel('accuracy', size=12)
+    plt.xlabel('epoch', size=12)
+    plt.legend(['train', 'val'], fontsize=10)
+
+    plt.show()

@@ -7,3 +7,4 @@ Pillow
 tensorflow < 3
 opencv-python
 black
+pydot
