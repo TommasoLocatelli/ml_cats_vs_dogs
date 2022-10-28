@@ -3,6 +3,7 @@ import pathlib
 import PIL
 import PIL.Image
 import tensorflow as tf
+import os
 
 
 def ready_to_be_used_dataset(
@@ -45,23 +46,30 @@ def tensor_to_image(tensor):
         tensor = tensor[0]
     return PIL.Image.fromarray(tensor)
 
+
 def performance_plot(history):
     plt.figure(figsize=(16, 6))
 
     # Plot loss
     plt.subplot(1, 2, 1)
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.ylabel('loss', size=12)
-    plt.xlabel('epoch', size=12)
-    plt.legend(['train', 'val'], fontsize=10)
+    plt.plot(history.history["loss"])
+    plt.plot(history.history["val_loss"])
+    plt.ylabel("loss", size=12)
+    plt.xlabel("epoch", size=12)
+    plt.legend(["train", "val"], fontsize=10)
 
     # Plot accuracy
     plt.subplot(1, 2, 2)
-    plt.plot(history.history['accuracy'])
-    plt.plot(history.history['val_accuracy'])
-    plt.ylabel('accuracy', size=12)
-    plt.xlabel('epoch', size=12)
-    plt.legend(['train', 'val'], fontsize=10)
+    plt.plot(history.history["accuracy"])
+    plt.plot(history.history["val_accuracy"])
+    plt.ylabel("accuracy", size=12)
+    plt.xlabel("epoch", size=12)
+    plt.legend(["train", "val"], fontsize=10)
 
     plt.show()
+
+
+def delete_from_list(filename="files.to.delete.txt"):
+    with open(filename, "rt") as f:
+        for pth in f.readlines():
+            os.remove(pth)
