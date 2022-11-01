@@ -1,8 +1,10 @@
 # %%
-from utilities import *
+import os
+from pathlib import Path, PurePath
+from tqdm import tqdm
 
+# %%
 import tensorflow as tf
-from tensorflow import keras
 
 from keras.layers import *
 from keras.models import *
@@ -13,11 +15,10 @@ from keras.utils import *
 from tensorflow.errors import InvalidArgumentError
 
 # %%
-import os
-from tqdm import tqdm
-
-pth = "downloads/CatsDogs/{}"
-data_dir = pathlib.Path(pth.format("tmp/"))
+root = PurePath("downloads/CatsDogs")
+temp_root = PurePath(root, "tmp")
+Path(temp_root, "Cats").mkdir(parents=True, exist_ok=True)
+Path(temp_root, "Dogs").mkdir(parents=True, exist_ok=True)
 
 # %%
 size = 128
@@ -35,40 +36,30 @@ model.compile(
     metrics=["accuracy"],
 )
 
-
 # %%
-for razza in [
-    "Cats",
-    "Dogs",
-]:
+for razza in ["Cats", "Dogs"]:
     for i in tqdm(range(12500)):
 
-        orig_path = pth.format("") + razza + f"/{i}.jpg"
-        temp_path = pth.format("tmp/") + razza + f"/{i}.jpg"
+        filename = f"{i}.jpg"
+        orig_path = PurePath(root, razza, filename)
+        temp_path = PurePath(temp_root, razza, filename)
+
         try:
             os.rename(orig_path, temp_path)
         except:
-            print(orig_path, "already deleted")
+            print(orig_path, "not found (already deleted?)")
             continue
 
-        train_ds = tf.keras.utils.image_dataset_from_directory(
-            data_dir,
-            # validation_split=0.2,
+        train_ds = image_dataset_from_directory(
+            temp_root,
             color_mode="grayscale",
-            # subset="training",
-            # seed=seed,
             image_size=(size, size),
             batch_size=batch_size,
         )
 
-        # normalization_layer = tf.keras.layers.Rescaling(1.0 / 255)
-        # normalized_train = train_ds.map(lambda x, y: (normalization_layer(x), y))
-
         try:
             model.fit(train_ds, epochs=1, verbose=0)
         except InvalidArgumentError:
-            # print('removing', temp_path)
-            # os.remove(temp_path)
             with open("files.to.delete.txt", "a") as f:
                 f.write(orig_path + "\n")
         finally:
