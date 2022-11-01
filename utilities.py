@@ -4,6 +4,7 @@ import PIL
 import PIL.Image
 import tensorflow as tf
 import os
+from matplotlib import pyplot as plt
 
 
 def ready_to_be_used_dataset(
@@ -70,6 +71,14 @@ def performance_plot(history):
 
 
 def delete_from_list(filename="files.to.delete.txt"):
+    count = 0
     with open(filename, "rt") as f:
-        for pth in f.readlines():
-            os.remove(pth)
+        lines = f.readlines()
+        for pth in lines:
+            try:
+                os.remove(pth.strip())
+                count += 1
+            except:
+                pass
+
+    print(count, "of", len(lines), "files deleted", )
