@@ -9,3 +9,6 @@ opencv-python
 black
 pydot
 tqdm
+scikit-learn
+
+
