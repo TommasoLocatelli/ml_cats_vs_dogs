@@ -94,47 +94,37 @@ def delete_from_list(filename="files.to.delete.txt"):
     print(count, "of", len(lines), "files deleted", )
 
 def five_fold_cross_validation(
-        
-    model,
-    batch_size,
-    img_width, img_height, 
-    color_mode,
-    no_epochs,
-    batch_size = 42,
-    loss_function = sparse_categorical_crossentropy,
-    no_classes = 2,
-    optimizer = Adam(),
-    verbosity = 1,
-    num_folds = 5,
-    seed=123,
-    data_dir = pathlib.Path("downloads\CatsDogs")
+                            Model,
+                            ds,
+                            k=5,
+                            no_epochs=5):
+    '''
+    https://github.com/christianversloot/machine-learning-articles/blob/main/how-to-use-k-fold-cross-validation-with-keras.md
+    '''
     
-    ):
-
-    ds = tf.keras.utils.image_dataset_from_directory(
-        data_dir,
-        color_mode=color_mode,
-        seed=seed,
-        image_size=(img_height, img_width),
-        batch_size=batch_size,
-    )
+    inputs = np.array([i[0] for _,(i,l) in enumerate(ds)])
+    targets = np.array([l[0] for _,(i,l) in enumerate(ds)])
     
-    
-    
-     # Define per-fold score containers
+    # Define per-fold score containers
     acc_per_fold = []
-    loss_per_fold = []   
-
+    loss_per_fold = []
+    
     # Define the K-fold Cross Validator
-    kfold = KFold(n_splits=num_folds, shuffle=True)
+    kfold = KFold(n_splits=k, shuffle=True)
+
+    # K-fold Cross Validation model evaluation
+    fold_no = 1
 
     # K-fold Cross Validation model evaluation
     fold_no = 1
     for train, test in kfold.split(inputs, targets):
+    
+        # Define the model architecture
+        model = Model
 
         # Compile the model
-        model.compile(loss=loss_function,
-                        optimizer=optimizer,
+        model.compile(loss=SparseCategoricalCrossentropy(),
+                        optimizer=Adam(),
                         metrics=['accuracy'])
 
 
@@ -144,9 +134,9 @@ def five_fold_cross_validation(
 
         # Fit data to model
         history = model.fit(inputs[train], targets[train],
-                    batch_size=batch_size,
+                    batch_size=1,
                     epochs=no_epochs,
-                    verbose=verbosity)
+                    verbose=1)
 
         # Generate generalization metrics
         scores = model.evaluate(inputs[test], targets[test], verbose=0)
@@ -156,15 +146,3 @@ def five_fold_cross_validation(
 
         # Increase fold number
         fold_no = fold_no + 1
-
-    # == Provide average scores ==
-    print('------------------------------------------------------------------------')
-    print('Score per fold')
-    for i in range(0, len(acc_per_fold)):
-        print('------------------------------------------------------------------------')
-        print(f'> Fold {i+1} - Loss: {loss_per_fold[i]} - Accuracy: {acc_per_fold[i]}%')
-        print('------------------------------------------------------------------------')
-        print('Average scores for all folds:')
-        print(f'> Accuracy: {np.mean(acc_per_fold)} (+- {np.std(acc_per_fold)})')
-        print(f'> Loss: {np.mean(loss_per_fold)}')
-        print('------------------------------------------------------------------------')
