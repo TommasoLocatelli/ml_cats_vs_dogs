@@ -26,7 +26,7 @@ def ready_to_be_used_dataset(
     img_width = image_squared_size
     train_ds = tf.keras.utils.image_dataset_from_directory(
         data_dir,
-        validation_split=0.2,
+        validation_split=0.5,
         color_mode=color_mode,
         subset="training",
         seed=seed,
@@ -36,7 +36,7 @@ def ready_to_be_used_dataset(
     val_ds = tf.keras.utils.image_dataset_from_directory(
         data_dir,
         color_mode=color_mode,
-        validation_split=0.2,
+        validation_split=0.5,
         subset="validation",
         seed=seed,
         image_size=(img_height, img_width),
@@ -117,32 +117,36 @@ def five_fold_cross_validation(
 
     # K-fold Cross Validation model evaluation
     fold_no = 1
-    for train, test in kfold.split(inputs, targets):
     
-        # Define the model architecture
-        model = Model
+    
+    for train, test in kfold.split(inputs, targets):
+        
+        tf.keras.backend.clear_session()
 
         # Compile the model
-        model.compile(loss=SparseCategoricalCrossentropy(),
+        Model.compile(loss=SparseCategoricalCrossentropy(),
                         optimizer=Adam(),
                         metrics=['accuracy'])
 
 
         # Generate a print
-        print('------------------------------------------------------------------------')
+        print('------------------------------------------------------------------------------------------')
         print(f'Training for fold {fold_no} ...')
 
         # Fit data to model
-        history = model.fit(inputs[train], targets[train],
+        history = Model.fit(inputs[train], targets[train],
                     batch_size=1,
                     epochs=no_epochs,
                     verbose=1)
 
         # Generate generalization metrics
-        scores = model.evaluate(inputs[test], targets[test], verbose=0)
-        print(f'Score for fold {fold_no}: {model.metrics_names[0]} of {scores[0]}; {model.metrics_names[1]} of {scores[1]*100}%')
-        acc_per_fold.append(scores[1] * 100)
+        scores = Model.evaluate(inputs[test], targets[test], verbose=0)
+        print(f'Score for fold {fold_no}: {Model.metrics_names[0]} of {scores[0]}; {Model.metrics_names[1]} of {scores[1]}')
+        acc_per_fold.append(scores[1])
         loss_per_fold.append(scores[0])
 
         # Increase fold number
         fold_no = fold_no + 1
+        
+    print('------------------------------------------------------------------------------------------')   
+    print(f'Risk estimantion (average zero one loss):{1-sum(acc_per_fold)/len(acc_per_fold)}')
