@@ -122,8 +122,6 @@ def five_fold_cross_validation(Model, ds, k=5, no_epochs=5):
     # K-fold Cross Validation model evaluation
     fold_no = 1
 
-    # K-fold Cross Validation model evaluation
-    fold_no = 1
     for train, test in kfold.split(inputs, targets):
 
         # Define the model architecture
@@ -131,13 +129,13 @@ def five_fold_cross_validation(Model, ds, k=5, no_epochs=5):
 
         # Compile the model
         model.compile(
-            loss=SparseCategoricalCrossentropy(), optimizer=Adam(), metrics=["accuracy"]
+            loss=SparseCategoricalCrossentropy(),
+            optimizer=Adam(),
+            metrics=["accuracy"],
         )
 
         # Generate a print
-        print(
-            "------------------------------------------------------------------------"
-        )
+        print("-" * 70)
         print(f"Training for fold {fold_no} ...")
 
         # Fit data to model
