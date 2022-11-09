@@ -9,7 +9,6 @@ from sklearn.model_selection import KFold
 
 
 import tensorflow as tf
-from tensorflow import keras
 from keras.layers import *
 from keras.models import *
 from keras.losses import *
@@ -18,12 +17,16 @@ from keras.utils import *
 
 
 def ready_to_be_used_dataset(
-    seed=123, image_squared_size=256, color_mode="rgb"
+    seed=42,
+    image_squared_size=256,
+    color_mode="rgb",
+    batch_size=32,
 ):  # color_mode	One of "grayscale", "rgb", "rgba". Default: "rgb"
+
     data_dir = pathlib.Path("downloads\CatsDogs")
-    batch_size = 42
     img_height = image_squared_size
     img_width = image_squared_size
+
     train_ds = tf.keras.utils.image_dataset_from_directory(
         data_dir,
         validation_split=0.5,
@@ -33,6 +36,7 @@ def ready_to_be_used_dataset(
         image_size=(img_height, img_width),
         batch_size=batch_size,
     )
+
     val_ds = tf.keras.utils.image_dataset_from_directory(
         data_dir,
         color_mode=color_mode,
@@ -42,7 +46,8 @@ def ready_to_be_used_dataset(
         image_size=(img_height, img_width),
         batch_size=batch_size,
     )
-    normalization_layer = tf.keras.layers.Rescaling(1.0 / 255)
+
+    normalization_layer = Rescaling(1.0 / 255)
     normalized_train = train_ds.map(lambda x, y: (normalization_layer(x), y))
     normalized_val = val_ds.map(lambda x, y: (normalization_layer(x), y))
     return normalized_train, normalized_val
@@ -91,47 +96,46 @@ def delete_from_list(filename="files.to.delete.txt"):
             except:
                 pass
 
-    print(count, "of", len(lines), "files deleted", )
+    print(
+        count,
+        "of",
+        len(lines),
+        "files deleted",
+    )
 
-def five_fold_cross_validation(
-                            Model,
-                            ds,
-                            k=5,
-                            no_epochs=5):
-    '''
+
+def five_fold_cross_validation(Model, ds, k=5, no_epochs=5):
+    """
     https://github.com/christianversloot/machine-learning-articles/blob/main/how-to-use-k-fold-cross-validation-with-keras.md
-    '''
-    
-    inputs = np.array([i[0] for _,(i,l) in enumerate(ds)])
-    targets = np.array([l[0] for _,(i,l) in enumerate(ds)])
-    
+    """
+
+    inputs = np.array([i[0] for _, (i, l) in enumerate(ds)])
+    targets = np.array([l[0] for _, (i, l) in enumerate(ds)])
+
     # Define per-fold score containers
     acc_per_fold = []
     loss_per_fold = []
-    
+
     # Define the K-fold Cross Validator
     kfold = KFold(n_splits=k, shuffle=True)
 
     # K-fold Cross Validation model evaluation
     fold_no = 1
 
-    # K-fold Cross Validation model evaluation
-    fold_no = 1
-    
-    
     for train, test in kfold.split(inputs, targets):
         
         tf.keras.backend.clear_session()
 
         # Compile the model
-        Model.compile(loss=SparseCategoricalCrossentropy(),
-                        optimizer=Adam(),
-                        metrics=['accuracy'])
-
+        model.compile(
+            loss=SparseCategoricalCrossentropy(),
+            optimizer=Adam(),
+            metrics=["accuracy"],
+        )
 
         # Generate a print
-        print('------------------------------------------------------------------------------------------')
-        print(f'Training for fold {fold_no} ...')
+        print("-" * 70)
+        print(f"Training for fold {fold_no} ...")
 
         # Fit data to model
         history = Model.fit(inputs[train], targets[train],
