@@ -2,13 +2,14 @@ import numpy as np
 import pathlib
 import PIL
 import PIL.Image
-import tensorflow as tf
 import os
 from matplotlib import pyplot as plt
 from sklearn.model_selection import KFold
 
 
 import tensorflow as tf
+from tensorflow import keras
+
 from keras.layers import *
 from keras.models import *
 from keras.losses import *
@@ -23,7 +24,7 @@ def ready_to_be_used_dataset(
     batch_size=32,
 ):  # color_mode	One of "grayscale", "rgb", "rgba". Default: "rgb"
 
-    data_dir = pathlib.Path("downloads\CatsDogs")
+    data_dir = pathlib.Path("downloads","CatsDogs")
     img_height = image_squared_size
     img_width = image_squared_size
 
@@ -104,7 +105,7 @@ def delete_from_list(filename="files.to.delete.txt"):
     )
 
 
-def five_fold_cross_validation(Model, ds, k=5, no_epochs=5, learning_rate=0.000001):
+def five_fold_cross_validation(model, ds, k=5, no_epochs=5, learning_rate=0.000001):
     """
     https://github.com/christianversloot/machine-learning-articles/blob/main/how-to-use-k-fold-cross-validation-with-keras.md
     """
@@ -127,7 +128,7 @@ def five_fold_cross_validation(Model, ds, k=5, no_epochs=5, learning_rate=0.0000
         tf.keras.backend.clear_session()
 
         # Compile the model
-        Model.compile(
+        model.compile(
             loss=SparseCategoricalCrossentropy(),
             optimizer=Adam(learning_rate=learning_rate),
             metrics=["accuracy"],
@@ -138,14 +139,14 @@ def five_fold_cross_validation(Model, ds, k=5, no_epochs=5, learning_rate=0.0000
         print(f"Training for fold {fold_no} ...")
 
         # Fit data to model
-        history = Model.fit(inputs[train], targets[train],
+        history = model.fit(inputs[train], targets[train],
                     batch_size=1,
                     epochs=no_epochs,
                     verbose=1)
 
         # Generate generalization metrics
-        scores = Model.evaluate(inputs[test], targets[test], verbose=0)
-        print(f'Score for fold {fold_no}: {Model.metrics_names[0]} of {scores[0]}; {Model.metrics_names[1]} of {scores[1]}')
+        scores = model.evaluate(inputs[test], targets[test], verbose=0)
+        print(f'Score for fold {fold_no}: {model.metrics_names[0]} of {scores[0]}; {model.metrics_names[1]} of {scores[1]}')
         acc_per_fold.append(scores[1])
         loss_per_fold.append(scores[0])
 
@@ -154,3 +155,5 @@ def five_fold_cross_validation(Model, ds, k=5, no_epochs=5, learning_rate=0.0000
         
     print('------------------------------------------------------------------------------------------')   
     print(f'Risk estimantion (average zero one loss):{1-sum(acc_per_fold)/len(acc_per_fold)}')
+
+    return acc_per_fold
