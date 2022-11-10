@@ -104,7 +104,7 @@ def delete_from_list(filename="files.to.delete.txt"):
     )
 
 
-def five_fold_cross_validation(Model, ds, k=5, no_epochs=5):
+def five_fold_cross_validation(model, ds, k=5, no_epochs=5):
     """
     https://github.com/christianversloot/machine-learning-articles/blob/main/how-to-use-k-fold-cross-validation-with-keras.md
     """
