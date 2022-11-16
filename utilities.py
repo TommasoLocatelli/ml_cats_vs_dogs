@@ -274,6 +274,6 @@ def k_fold_cross_validation(
 
     with open(f"accuracies_{tag}.txt", "wt") as f:
         for e in accuracies:
-            f.writeline(e)
+            f.write(f"{e}\n")
 
     return accuracies
