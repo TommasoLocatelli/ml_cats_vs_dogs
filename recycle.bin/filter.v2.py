@@ -1,4 +1,3 @@
-from ast import Slice
 from struct import unpack
 import os
 
@@ -40,10 +39,10 @@ class JPEG:
 
 bad_paths = []
 
-images = [] # list
+images = []  # list
 
 for folder_name in ("Cats", "Dogs"):
-    folder_path = os.path.join("downloads/CatsDogs", folder_name)
+    folder_path = os.path.join("downloads", "CatsDogs", folder_name)
     for fname in os.listdir(folder_path):
         image = os.path.join(folder_path, fname)
 
@@ -59,22 +58,6 @@ print(len(bad_paths))
 for pth in bad_paths:
     try:
         os.remove(pth)
-        print(pth,'removed')
+        print(pth, "removed")
     except Exception as e:
-        print('FATAL ERROR @', pth, ':', e)
-
-# %%
-import numpy as np
-from keras.layers import *
-
-input_shape = (2, 2, 3)
-x = np.arange(np.prod(input_shape)).reshape(input_shape)
-print(x)
-
-y = Cropping1D(cropping=2)(x)
-print(y)
-
-
-Slice
-
-# %%
+        print("FATAL ERROR @", pth, ":", e)

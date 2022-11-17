@@ -1,0 +1,34 @@
+Model: "sequential_3"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ rescaling_3 (Rescaling)     (None, 128, 128, 3)       0         
+                                                                 
+ conv2d_10 (Conv2D)          (None, 128, 128, 16)      448       
+                                                                 
+ max_pooling2d_10 (MaxPoolin  (None, 64, 64, 16)       0         
+ g2D)                                                            
+                                                                 
+ conv2d_11 (Conv2D)          (None, 64, 64, 32)        4640      
+                                                                 
+ max_pooling2d_11 (MaxPoolin  (None, 32, 32, 32)       0         
+ g2D)                                                            
+                                                                 
+ conv2d_12 (Conv2D)          (None, 32, 32, 64)        18496     
+                                                                 
+ max_pooling2d_12 (MaxPoolin  (None, 16, 16, 64)       0         
+ g2D)                                                            
+                                                                 
+ flatten_3 (Flatten)         (None, 16384)             0         
+                                                                 
+ dense_9 (Dense)             (None, 64)                1048640   
+                                                                 
+ dense_10 (Dense)            (None, 8)                 520       
+                                                                 
+ dense_11 (Dense)            (None, 2)                 18        
+                                                                 
+=================================================================
+Total params: 1,072,762
+Trainable params: 1,072,762
+Non-trainable params: 0
+_________________________________________________________________

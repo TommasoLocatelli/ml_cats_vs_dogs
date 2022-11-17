@@ -27,6 +27,7 @@ batch_size = 1
 model = Sequential(
     [
         Flatten(input_shape=(size, size, 1)),
+        Dense(1)
     ]
 )
 
