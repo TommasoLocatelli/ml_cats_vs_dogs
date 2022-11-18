@@ -18,7 +18,7 @@ from keras.losses import *
 from keras.optimizers import *
 from keras.utils import *
 from keras.callbacks import *
-import CNNModels
+#import CNNModels
 
 DATASET_DIRECTORY = pathlib.Path("downloads", "CatsDogs")
 import gc
