@@ -3,14 +3,11 @@ import pathlib
 import PIL
 import PIL.Image
 import os
+import gc
 from matplotlib import pyplot as plt
-from sklearn.model_selection import KFold
-from numba import cuda
-
 from pathlib import Path, PurePath
 
 import tensorflow as tf
-from tensorflow import keras
 
 from keras.layers import *
 from keras.models import *
@@ -18,16 +15,14 @@ from keras.losses import *
 from keras.optimizers import *
 from keras.utils import *
 from keras.callbacks import *
-#import CNNModels
+import CNNModels
 
 DATASET_DIRECTORY = pathlib.Path("downloads", "CatsDogs")
-import gc
 
 
 def ready_to_be_used_dataset(
     image_size,
     color_mode="rgb",
-    batch_size=32,
     seed=42,
 ):
     """
@@ -36,22 +31,20 @@ def ready_to_be_used_dataset(
 
     training_dataset = image_dataset_from_directory(
         DATASET_DIRECTORY,
-        validation_split=0.5,
+        validation_split=0.7,
         color_mode=color_mode,
         subset="training",
         seed=seed,
         image_size=(image_size, image_size),
-        batch_size=batch_size,
     )
 
     validation_dataset = image_dataset_from_directory(
         DATASET_DIRECTORY,
         color_mode=color_mode,
-        validation_split=0.5,
+        validation_split=0.7,
         subset="validation",
         seed=seed,
         image_size=(image_size, image_size),
-        batch_size=batch_size,
     )
 
     # normalization_layer = Rescaling(1.0 / 255)
@@ -129,6 +122,7 @@ def delete_from_list(filename="files.to.delete.txt"):
         "files deleted",
     )
 
+
 def validate_tag(model, color_mode, image_size):
     tag = f"{model}_model_{color_mode}_x{image_size}_img"
     Path(tag).mkdir(parents=True, exist_ok=True)
@@ -140,7 +134,6 @@ def auto_train(
     image_size=128,
     color_mode="rgb",
     epochs=24,
-    batch_size=32,
 ):
     # REF TAG
     tag = validate_tag(model_name, image_size=image_size, color_mode=color_mode)
@@ -149,10 +142,10 @@ def auto_train(
     train_val, test = ready_to_be_used_dataset(
         image_size=image_size,
         color_mode=color_mode,
-        batch_size=batch_size,
     )
-    train_size = int(len(train_val) * 0.8)
-    train, valid = train_val.take(train_size), train_val.skip(train_size)
+
+    valid_size = len(train_val) // 5
+    valid, train = train_val.take(valid_size), train_val.skip(valid_size)
 
     # CREATE MODEL
     model = CNNModels.get_model(model_name)
@@ -167,8 +160,7 @@ def auto_train(
         x=train,
         validation_data=valid,
         epochs=epochs,
-        batch_size=batch_size,
-        callbacks=[EarlyStopping(monitor="val_accuracy", min_delta=0.02, patience=3)],
+        callbacks=[EarlyStopping(monitor="val_accuracy", min_delta=0.01, patience=4)],
     )
 
     performance_plot(results, tag)
@@ -178,10 +170,6 @@ def auto_train(
         model.summary(print_fn=lambda x: f.write(x + "\n"))
 
     # THAT's ALL FOLKS
-    tf.keras.backend.clear_session()
-    # cuda.select_device(0)
-    # cuda.close()
-    # print("GPU MEM RESET")
     del model
     gc.collect()
 
@@ -194,61 +182,66 @@ def k_fold_cross_validation(
     model_name,
     k=5,
     epochs=24,
-    batch_size=32,
+    learning_rate=1e-3,
 ):
     """
     https://github.com/christianversloot/machine-learning-articles/blob/main/how-to-use-k-fold-cross-validation-with-keras.md
     """
 
-    # # NOTE that's gonna cost you A LOT OF RAM
-    # inputs = np.array([e for batch, _ in iter(dataset) for e in batch])
-    # targets = np.array([l for _, labels in iter(dataset) for l in labels])
-
     # per-fold score containers
     accuracies = []
     losses = []
 
-    # kfold = KFold(n_splits=k, shuffle=True)
-    # fold_counter = 0
-
     for fold_counter in range(k):
 
         # ROTATE SPLITTING OF TESTING
-        test_size = len(dataset) // k
-        train_lx_size = len(dataset) * fold_counter // k
+        N = len(dataset)
+        fold_size =  N // k
+        train_lx_size = N * fold_counter // k
 
         train_lx = dataset.take(train_lx_size)
-        test = dataset.skip(train_lx_size).take(test_size)
-        validation = dataset.skip(train_lx_size + test_size).take(test_size)
-        train_rx = dataset.skip(train_lx_size + test_size + test_size)
+        test = dataset.skip(train_lx_size).take(fold_size)
+        validation = dataset.skip(train_lx_size + fold_size).take(fold_size)
+        train_rx = dataset.skip(train_lx_size + fold_size + fold_size)
+
+        if fold_counter == k-1:
+            validation, train_lx = train_lx.take(fold_size), train_lx.skip(fold_size)
 
         train = train_rx.concatenate(train_lx)
 
+        print("FSIZE:", len(train), len(validation), len(test))
+
         # CREATE MODEL
-        model = CNNModels.get_model(model_name)
+        if type(model_name) is list:
+            model = Sequential(model_name)
+            optimizer = Adam(learning_rate=learning_rate)
+        else:
+            model = CNNModels.get_model(model_name)
+            optimizer = Adam()
         model.compile(
-            optimizer=Adam(),  # NOTE learning rate?
+            optimizer=optimizer, 
             loss=SparseCategoricalCrossentropy(from_logits=True),
             metrics=["accuracy"],
         )
 
         # FITTING
         print("-" * 35)
-        print(f"Training for fold {fold_counter+1} ...")
+        print(f">> Train fold {fold_counter+1} ...")
         print("-" * 35)
 
         model.fit(
             x=train,
             validation_data=validation,
-            batch_size=batch_size,
             epochs=epochs,
-            callbacks=[EarlyStopping(monitor="val_accuracy", min_delta=0.02, patience=3)],
+            callbacks=[
+                EarlyStopping(monitor="val_accuracy", min_delta=0.01, patience=4)
+            ],
             verbose=2,
         )
 
         # EVALUATING
         print("-" * 35)
-        print(f"Testing for fold {fold_counter+1} ...")
+        print(f"<< Eval fold {fold_counter+1} ...")
         print("-" * 35)
 
         scores = model.evaluate(test)
@@ -261,14 +254,7 @@ def k_fold_cross_validation(
         accuracies.append(scores[1])
         losses.append(scores[0])
 
-        # fold_counter += 1
-
         # THAT's ALL FOLKS
-        tf.keras.backend.clear_session()
-        # cuda.select_device(0)
-        # cuda.close()
-        # print("GPU MEM RESET")
-
         del model
         gc.collect()
 

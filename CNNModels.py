@@ -10,6 +10,7 @@ from keras.utils import *
 padding = "same"
 activation = "relu"
 
+
 def BASE():
     model = Sequential()
     model.add(Rescaling(1.0 / 255))
@@ -55,6 +56,7 @@ def BASE():
     )
     model.add(Dense(2))
     return model
+
 
 def THICK():
     model = Sequential()
@@ -158,15 +160,15 @@ def LONG():
     model.add(Dense(2))
     return model
 
-def get_model(model_name : str):
-    match model_name.upper():
-        case "BASE":
-            return BASE()
-        case "THICK":
-            return THICK()
-        case "LONG":
-            return LONG()
-        case "_":
-            print("!!! NO MODEL FOUND, USING DEFAULT BASE !!!")
-            return BASE()
-        
+
+def get_model(model_name: str):
+    model_name = model_name.upper()
+    if model_name == "BASE":
+        return BASE()
+    if model_name == "THICK":
+        return THICK()
+    if model_name == "LONG":
+        return LONG()
+    if model_name == "_":
+        print("!!! NO MODEL FOUND, USING DEFAULT BASE !!!")
+        return None
