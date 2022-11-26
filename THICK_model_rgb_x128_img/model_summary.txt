@@ -1,31 +1,31 @@
-Model: "sequential"
+Model: "sequential_6"
 _________________________________________________________________
  Layer (type)                Output Shape              Param #   
 =================================================================
- rescaling (Rescaling)       (None, 128, 128, 3)       0         
+ rescaling_6 (Rescaling)     (None, 128, 128, 3)       0         
                                                                  
- conv2d (Conv2D)             (None, 128, 128, 32)      896       
+ conv2d_19 (Conv2D)          (None, 128, 128, 32)      896       
                                                                  
- max_pooling2d (MaxPooling2D  (None, 64, 64, 32)       0         
- )                                                               
+ max_pooling2d_19 (MaxPoolin  (None, 64, 64, 32)       0         
+ g2D)                                                            
                                                                  
- conv2d_1 (Conv2D)           (None, 64, 64, 64)        32832     
+ conv2d_20 (Conv2D)          (None, 64, 64, 64)        32832     
                                                                  
- max_pooling2d_1 (MaxPooling  (None, 32, 32, 64)       0         
- 2D)                                                             
+ max_pooling2d_20 (MaxPoolin  (None, 32, 32, 64)       0         
+ g2D)                                                            
                                                                  
- conv2d_2 (Conv2D)           (None, 32, 32, 128)       204928    
+ conv2d_21 (Conv2D)          (None, 32, 32, 128)       204928    
                                                                  
- max_pooling2d_2 (MaxPooling  (None, 16, 16, 128)      0         
- 2D)                                                             
+ max_pooling2d_21 (MaxPoolin  (None, 16, 16, 128)      0         
+ g2D)                                                            
                                                                  
- flatten (Flatten)           (None, 32768)             0         
+ flatten_6 (Flatten)         (None, 32768)             0         
                                                                  
- dense (Dense)               (None, 128)               4194432   
+ dense_18 (Dense)            (None, 128)               4194432   
                                                                  
- dense_1 (Dense)             (None, 16)                2064      
+ dense_19 (Dense)            (None, 16)                2064      
                                                                  
- dense_2 (Dense)             (None, 2)                 34        
+ dense_20 (Dense)            (None, 2)                 34        
                                                                  
 =================================================================
 Total params: 4,435,186
